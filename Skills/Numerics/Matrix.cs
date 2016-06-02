@@ -13,7 +13,7 @@ namespace Moserware.Numerics
         private const int FractionalDigitsToRoundTo = 10;
         private static readonly double ErrorTolerance = Math.Pow(0.1, FractionalDigitsToRoundTo); // e.g. 1/10^10
 
-        protected double[][] _MatrixRowValues;
+        protected double[][] MatrixRowValues;
         // Note: some properties like Determinant, Inverse, etc are properties instead
         // of methods to make the syntax look nicer even though this sort of goes against
         // Framework Design Guidelines that properties should be "cheap" since it could take
@@ -28,18 +28,18 @@ namespace Moserware.Numerics
             Rows = rows;
             Columns = columns;
 
-            _MatrixRowValues = new double[rows][];
+            MatrixRowValues = new double[rows][];
 
             int currentIndex = 0;
             for (int currentRow = 0; currentRow < Rows; currentRow++)
             {
-                _MatrixRowValues[currentRow] = new double[Columns];
+                MatrixRowValues[currentRow] = new double[Columns];
 
                 for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                 {
                     if ((allRowValues != null) && (currentIndex < allRowValues.Length))
                     {
-                        _MatrixRowValues[currentRow][currentColumn] = allRowValues[currentIndex++];
+                        MatrixRowValues[currentRow][currentColumn] = allRowValues[currentIndex++];
                     }
                 }
             }
@@ -47,21 +47,21 @@ namespace Moserware.Numerics
 
         public Matrix(double[][] rowValues)
         {
-            if (!rowValues.All(row => row.Length == rowValues[0].Length))
+            if (rowValues.Any(row => row.Length != rowValues[0].Length))
             {
                 throw new ArgumentException("All rows must be the same length!");
             }
 
             Rows = rowValues.Length;
             Columns = rowValues[0].Length;
-            _MatrixRowValues = rowValues;
+            MatrixRowValues = rowValues;
         }
 
         protected Matrix(int rows, int columns, double[][] matrixRowValues)
         {
             Rows = rows;
             Columns = columns;
-            _MatrixRowValues = matrixRowValues;
+            MatrixRowValues = matrixRowValues;
         }
 
         public Matrix(int rows, int columns, IEnumerable<IEnumerable<double>> columnValues)
@@ -74,7 +74,7 @@ namespace Moserware.Numerics
                 int rowIndex = 0;
                 foreach (double currentColumnValue in currentColumn)
                 {
-                    _MatrixRowValues[rowIndex++][columnIndex] = currentColumnValue;
+                    MatrixRowValues[rowIndex++][columnIndex] = currentColumnValue;
                 }
                 columnIndex++;
             }
@@ -83,10 +83,7 @@ namespace Moserware.Numerics
         public int Rows { get; protected set; }
         public int Columns { get; protected set; }
 
-        public double this[int row, int column]
-        {
-            get { return _MatrixRowValues[row][column]; }
-        }
+        public double this[int row, int column] => MatrixRowValues[row][column];
 
         public Matrix Transpose
         {
@@ -106,7 +103,7 @@ namespace Moserware.Numerics
                          currentColumnTransposeMatrix++)
                     {
                         transposeMatrixCurrentRowColumnValues[currentColumnTransposeMatrix] =
-                            _MatrixRowValues[currentColumnTransposeMatrix][currentRowTransposeMatrix];
+                            MatrixRowValues[currentColumnTransposeMatrix][currentRowTransposeMatrix];
                     }
                 }
 
@@ -114,10 +111,7 @@ namespace Moserware.Numerics
             }
         }
 
-        private bool IsSquare
-        {
-            get { return (Rows == Columns) && Rows > 0; }
-        }
+        private bool IsSquare => (Rows == Columns) && Rows > 0;
 
         public double Determinant
         {
@@ -132,7 +126,7 @@ namespace Moserware.Numerics
                 if (Rows == 1)
                 {
                     // Really happy path :)
-                    return _MatrixRowValues[0][0];
+                    return MatrixRowValues[0][0];
                 }
 
                 if (Rows == 2)
@@ -142,10 +136,10 @@ namespace Moserware.Numerics
                     // | a b |
                     // | c d |
                     // The determinant is ad - bc
-                    double a = _MatrixRowValues[0][0];
-                    double b = _MatrixRowValues[0][1];
-                    double c = _MatrixRowValues[1][0];
-                    double d = _MatrixRowValues[1][1];
+                    double a = MatrixRowValues[0][0];
+                    double b = MatrixRowValues[0][1];
+                    double c = MatrixRowValues[1][0];
+                    double d = MatrixRowValues[1][1];
                     return a*d - b*c;
                 }
 
@@ -160,7 +154,7 @@ namespace Moserware.Numerics
                 // I expand along the first row
                 for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                 {
-                    double firstRowColValue = _MatrixRowValues[0][currentColumn];
+                    double firstRowColValue = MatrixRowValues[0][currentColumn];
                     double cofactor = GetCofactor(0, currentColumn);
                     double itemToAdd = firstRowColValue*cofactor;
                     result += itemToAdd;
@@ -190,10 +184,10 @@ namespace Moserware.Numerics
                     // | d -b |
                     // | -c a |
 
-                    double a = _MatrixRowValues[0][0];
-                    double b = _MatrixRowValues[0][1];
-                    double c = _MatrixRowValues[1][0];
-                    double d = _MatrixRowValues[1][1];
+                    double a = MatrixRowValues[0][0];
+                    double b = MatrixRowValues[0][1];
+                    double c = MatrixRowValues[1][0];
+                    double d = MatrixRowValues[1][1];
 
                     return new SquareMatrix(d, -b,
                                             -c, a);
@@ -222,7 +216,7 @@ namespace Moserware.Numerics
             {
                 if ((Rows == 1) && (Columns == 1))
                 {
-                    return new SquareMatrix(1.0/_MatrixRowValues[0][0]);
+                    return new SquareMatrix(1.0/MatrixRowValues[0][0]);
                 }
 
                 // Take the simple approach:
@@ -244,7 +238,7 @@ namespace Moserware.Numerics
 
                 for (int currentColumn = 0; currentColumn < columns; currentColumn++)
                 {
-                    newRowColumnValues[currentColumn] = scalarValue*matrix._MatrixRowValues[currentRow][currentColumn];
+                    newRowColumnValues[currentColumn] = scalarValue*matrix.MatrixRowValues[currentRow][currentColumn];
                 }
             }
 
@@ -268,9 +262,9 @@ namespace Moserware.Numerics
                 resultMatrix[currentRow] = rowColumnValues;
                 for (int currentColumn = 0; currentColumn < right.Columns; currentColumn++)
                 {
-                    rowColumnValues[currentColumn] = left._MatrixRowValues[currentRow][currentColumn]
+                    rowColumnValues[currentColumn] = left.MatrixRowValues[currentRow][currentColumn]
                                                      +
-                                                     right._MatrixRowValues[currentRow][currentColumn];
+                                                     right.MatrixRowValues[currentRow][currentColumn];
                 }
             }
 
@@ -285,7 +279,7 @@ namespace Moserware.Numerics
             if (left.Columns != right.Rows)
             {
                 throw new ArgumentException("The width of the left matrix must match the height of the right matrix",
-                                            "right");
+                                            nameof(right));
             }
 
             int resultRows = left.Rows;
@@ -303,8 +297,8 @@ namespace Moserware.Numerics
 
                     for (int vectorIndex = 0; vectorIndex < left.Columns; vectorIndex++)
                     {
-                        double leftValue = left._MatrixRowValues[currentRow][vectorIndex];
-                        double rightValue = right._MatrixRowValues[vectorIndex][currentColumn];
+                        double leftValue = left.MatrixRowValues[currentRow][vectorIndex];
+                        double rightValue = right.MatrixRowValues[vectorIndex][currentColumn];
                         double vectorIndexProduct = leftValue*rightValue;
                         productValue += vectorIndexProduct;
                     }
@@ -342,7 +336,7 @@ namespace Moserware.Numerics
                         continue;
                     }
 
-                    result[resultRow][resultColumn] = _MatrixRowValues[currentRow][currentColumn];
+                    result[resultRow][resultColumn] = MatrixRowValues[currentRow][currentColumn];
                     resultColumn++;
                 }
 
@@ -396,8 +390,8 @@ namespace Moserware.Numerics
                 for (int currentColumn = 0; currentColumn < a.Columns; currentColumn++)
                 {
                     double delta =
-                        Math.Abs(a._MatrixRowValues[currentRow][currentColumn] -
-                                 b._MatrixRowValues[currentRow][currentColumn]);
+                        Math.Abs(a.MatrixRowValues[currentRow][currentColumn] -
+                                 b.MatrixRowValues[currentRow][currentColumn]);
 
                     if (delta > ErrorTolerance)
                     {
@@ -428,7 +422,7 @@ namespace Moserware.Numerics
 
                     for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                     {
-                        double cellValue = _MatrixRowValues[currentRow][currentColumn];
+                        double cellValue = MatrixRowValues[currentRow][currentColumn];
                         double roundedValue = Math.Round(cellValue, FractionalDigitsToRoundTo);
                         result += multiplier*roundedValue;
                     }
@@ -467,7 +461,7 @@ namespace Moserware.Numerics
         {
             for (int i = 0; i < diagonalValues.Count; i++)
             {
-                _MatrixRowValues[i][i] = diagonalValues[i];
+                MatrixRowValues[i][i] = diagonalValues[i];
             }
         }
     }
@@ -489,11 +483,11 @@ namespace Moserware.Numerics
 
             int allValuesIndex = 0;
 
-            _MatrixRowValues = new double[Rows][];
+            MatrixRowValues = new double[Rows][];
             for (int currentRow = 0; currentRow < Rows; currentRow++)
             {
                 var currentRowValues = new double[Columns];
-                _MatrixRowValues[currentRow] = currentRowValues;
+                MatrixRowValues[currentRow] = currentRowValues;
 
                 for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                 {

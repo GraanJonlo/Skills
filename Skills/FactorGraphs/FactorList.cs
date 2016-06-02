@@ -8,39 +8,35 @@ namespace Moserware.Skills.FactorGraphs
     /// </summary>    
     public class FactorList<TValue>
     {        
-        private readonly List<Factor<TValue>> _List = new List<Factor<TValue>>();
+        private readonly List<Factor<TValue>> _list = new List<Factor<TValue>>();
 
         public double LogNormalization
         {
             get
             {                
-                _List.ForEach(f => f.ResetMarginals());
+                _list.ForEach(f => f.ResetMarginals());
 
                 double sumLogZ = 0.0;
                                 
-                for (int i = 0; i < _List.Count; i++)
+                foreach (Factor<TValue> f in _list)
                 {
-                    Factor<TValue> f = _List[i];
                     for (int j = 0; j < f.NumberOfMessages; j++)
                     {
                         sumLogZ += f.SendMessage(j);
                     }
                 }
                                 
-                double sumLogS = _List.Aggregate(0.0, (acc, fac) => acc + fac.LogNormalization);
+                double sumLogS = _list.Aggregate(0.0, (acc, fac) => acc + fac.LogNormalization);
 
                 return sumLogZ + sumLogS;
             }
         }
 
-        public int Count
-        {
-            get { return _List.Count; }
-        }
-                
+        public int Count => _list.Count;
+
         public Factor<TValue> AddFactor(Factor<TValue> factor)
         {
-            _List.Add(factor);
+            _list.Add(factor);
             return factor;
         }
     }

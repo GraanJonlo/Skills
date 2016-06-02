@@ -6,12 +6,12 @@ namespace Moserware.Skills.Elo
 {
     public class DuellingEloCalculator : SkillCalculator
     {
-        private readonly TwoPlayerEloCalculator _TwoPlayerEloCalc;
+        private readonly TwoPlayerEloCalculator _twoPlayerEloCalc;
 
         public DuellingEloCalculator(TwoPlayerEloCalculator twoPlayerEloCalculator)
             : base(SupportedOptions.None, TeamsRange.AtLeast(2), PlayersRange.AtLeast(1))
         {
-            _TwoPlayerEloCalc = twoPlayerEloCalculator;
+            _twoPlayerEloCalc = twoPlayerEloCalculator;
         }
 
         public override IDictionary<TPlayer, Rating> CalculateNewRatings<TPlayer>(GameInfo gameInfo, IEnumerable<IDictionary<TPlayer, Rating>> teams, params int[] teamRanks)
@@ -81,7 +81,7 @@ namespace Moserware.Skills.Elo
                                           PairwiseComparison weakToStrongComparison)
         {
             
-            var duelOutcomes = _TwoPlayerEloCalc.CalculateNewRatings(gameInfo, 
+            var duelOutcomes = _twoPlayerEloCalc.CalculateNewRatings(gameInfo, 
                                                                      Teams.Concat(
                                                                        new Team<TPlayer>(player1, player1Rating),
                                                                        new Team<TPlayer>(player2, player2Rating)),
@@ -127,7 +127,7 @@ namespace Moserware.Skills.Elo
                     var otherTeam = new Team(new Player(ixOtherTeam), otherTeamAverageRating);
 
                     minQuality = Math.Min(minQuality,
-                                          _TwoPlayerEloCalc.CalculateMatchQuality(gameInfo,
+                                          _twoPlayerEloCalc.CalculateMatchQuality(gameInfo,
                                                                                   Teams.Concat(currentTeam, otherTeam)));
                 }
             }

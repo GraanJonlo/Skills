@@ -3,7 +3,7 @@ namespace Moserware.Skills.Elo
 {
     public class KFactor
     {
-        private double _Value;
+        private readonly double _value;
 
         protected KFactor()
         {
@@ -11,12 +11,12 @@ namespace Moserware.Skills.Elo
 
         public KFactor(double exactKFactor)
         {
-            _Value = exactKFactor;
+            _value = exactKFactor;
         }
 
         public virtual double GetValueForRating(double rating)
         {
-            return _Value;
+            return _value;
         }
     }
 }

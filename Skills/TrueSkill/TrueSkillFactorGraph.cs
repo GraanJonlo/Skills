@@ -10,19 +10,19 @@ namespace Moserware.Skills.TrueSkill
     public class TrueSkillFactorGraph<TPlayer> :
         FactorGraph<TrueSkillFactorGraph<TPlayer>, GaussianDistribution, Variable<GaussianDistribution>>
     {
-        private readonly List<FactorGraphLayerBase<GaussianDistribution>> _Layers;
-        private readonly PlayerPriorValuesToSkillsLayer<TPlayer> _PriorLayer;
+        private readonly List<FactorGraphLayerBase<GaussianDistribution>> _layers;
+        private readonly PlayerPriorValuesToSkillsLayer<TPlayer> _priorLayer;
 
         public TrueSkillFactorGraph(GameInfo gameInfo, IEnumerable<IDictionary<TPlayer, Rating>> teams, int[] teamRanks)
         {
-            _PriorLayer = new PlayerPriorValuesToSkillsLayer<TPlayer>(this, teams);
+            _priorLayer = new PlayerPriorValuesToSkillsLayer<TPlayer>(this, teams);
             GameInfo = gameInfo;
             VariableFactory =
                 new VariableFactory<GaussianDistribution>(() => GaussianDistribution.FromPrecisionMean(0, 0));
 
-            _Layers = new List<FactorGraphLayerBase<GaussianDistribution>>
+            _layers = new List<FactorGraphLayerBase<GaussianDistribution>>
                           {
-                              _PriorLayer,
+                              _priorLayer,
                               new PlayerSkillsToPerformancesLayer<TPlayer>(this),
                               new PlayerPerformancesToTeamPerformancesLayer<TPlayer>(this),
                               new IteratedTeamDifferencesInnerLayer<TPlayer>(
@@ -38,7 +38,7 @@ namespace Moserware.Skills.TrueSkill
         {
             object lastOutput = null;
 
-            foreach (var currentLayer in _Layers)
+            foreach (var currentLayer in _layers)
             {
                 if (lastOutput != null)
                 {
@@ -54,14 +54,14 @@ namespace Moserware.Skills.TrueSkill
         public void RunSchedule()
         {
             Schedule<GaussianDistribution> fullSchedule = CreateFullSchedule();
-            double fullScheduleDelta = fullSchedule.Visit();
+            fullSchedule.Visit();
         }
 
         public double GetProbabilityOfRanking()
         {
             var factorList = new FactorList<GaussianDistribution>();
 
-            foreach (var currentLayer in _Layers)
+            foreach (var currentLayer in _layers)
             {
                 foreach (var currentFactor in currentLayer.UntypedFactors)
                 {
@@ -77,7 +77,7 @@ namespace Moserware.Skills.TrueSkill
         {
             var fullSchedule = new List<Schedule<GaussianDistribution>>();
 
-            foreach (var currentLayer in _Layers)
+            foreach (var currentLayer in _layers)
             {
                 Schedule<GaussianDistribution> currentPriorSchedule = currentLayer.CreatePriorSchedule();
                 if (currentPriorSchedule != null)
@@ -87,7 +87,7 @@ namespace Moserware.Skills.TrueSkill
             }
 
             // Casting to IEnumerable to get the LINQ Reverse()
-            IEnumerable<FactorGraphLayerBase<GaussianDistribution>> allLayers = _Layers;
+            IEnumerable<FactorGraphLayerBase<GaussianDistribution>> allLayers = _layers;
 
             foreach (var currentLayer in allLayers.Reverse())
             {
@@ -104,7 +104,7 @@ namespace Moserware.Skills.TrueSkill
         public IDictionary<TPlayer, Rating> GetUpdatedRatings()
         {
             var result = new Dictionary<TPlayer, Rating>();
-            foreach (var currentTeam in _PriorLayer.OutputVariablesGroups)
+            foreach (var currentTeam in _priorLayer.OutputVariablesGroups)
             {
                 foreach (var currentPlayer in currentTeam)
                 {

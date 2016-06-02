@@ -9,9 +9,9 @@ namespace Moserware.Skills
     public class Rating
     {
         private const int ConservativeStandardDeviationMultiplier = 3;
-        private readonly double _ConservativeStandardDeviationMultiplier;
-        private readonly double _Mean;
-        private readonly double _StandardDeviation;
+        private readonly double _conservativeStandardDeviationMultiplier;
+        private readonly double _mean;
+        private readonly double _standardDeviation;
 
         /// <summary>
         /// Constructs a rating.
@@ -31,34 +31,25 @@ namespace Moserware.Skills
         /// <param name="conservativeStandardDeviationMultiplier">The number of <paramref name="standardDeviation"/>s to subtract from the <paramref name="mean"/> to achieve a conservative rating.</param>
         public Rating(double mean, double standardDeviation, double conservativeStandardDeviationMultiplier)
         {
-            _Mean = mean;
-            _StandardDeviation = standardDeviation;
-            _ConservativeStandardDeviationMultiplier = conservativeStandardDeviationMultiplier;
+            _mean = mean;
+            _standardDeviation = standardDeviation;
+            _conservativeStandardDeviationMultiplier = conservativeStandardDeviationMultiplier;
         }
 
         /// <summary>
         /// The statistical mean value of the rating (also known as μ).
         /// </summary>
-        public double Mean
-        {
-            get { return _Mean; }
-        }
+        public double Mean => _mean;
 
         /// <summary>
         /// The standard deviation (the spread) of the rating. This is also known as σ.
         /// </summary>
-        public double StandardDeviation
-        {
-            get { return _StandardDeviation; }
-        }
+        public double StandardDeviation => _standardDeviation;
 
         /// <summary>
         /// A conservative estimate of skill based on the mean and standard deviation.
         /// </summary>
-        public double ConservativeRating
-        {
-            get { return _Mean - _ConservativeStandardDeviationMultiplier*_StandardDeviation; }
-        }
+        public double ConservativeRating => _mean - _conservativeStandardDeviationMultiplier*_standardDeviation;
 
         public static Rating GetPartialUpdate(Rating prior, Rating fullPosterior, double updatePercentage)
         {
@@ -80,15 +71,13 @@ namespace Moserware.Skills
                 priorGaussian.Precision + partialPrecisionDifference);
 
             return new Rating(partialPosteriorGaussion.Mean, partialPosteriorGaussion.StandardDeviation,
-                              prior._ConservativeStandardDeviationMultiplier);
+                              prior._conservativeStandardDeviationMultiplier);
         }
 
         public override string ToString()
         {
             // As a debug helper, display a localized rating:
-            return String.Format(
-                "μ={0:0.0000}, σ={1:0.0000}",
-                Mean, StandardDeviation);
+            return $"μ={Mean:0.0000}, σ={StandardDeviation:0.0000}";
         }
     }
 }

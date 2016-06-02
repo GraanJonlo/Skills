@@ -12,10 +12,10 @@ namespace Moserware.Skills.TrueSkill.Layers
         TrueSkillFactorGraphLayer
             <TPlayer, Variable<GaussianDistribution>, GaussianWeightedSumFactor, Variable<GaussianDistribution>>
     {
-        private readonly TeamDifferencesComparisonLayer<TPlayer> _TeamDifferencesComparisonLayer;
+        private readonly TeamDifferencesComparisonLayer<TPlayer> _teamDifferencesComparisonLayer;
 
         private readonly TeamPerformancesToTeamPerformanceDifferencesLayer<TPlayer>
-            _TeamPerformancesToTeamPerformanceDifferencesLayer;
+            _teamPerformancesToTeamPerformanceDifferencesLayer;
 
         public IteratedTeamDifferencesInnerLayer(TrueSkillFactorGraph<TPlayer> parentGraph,
                                                  TeamPerformancesToTeamPerformanceDifferencesLayer<TPlayer>
@@ -23,8 +23,8 @@ namespace Moserware.Skills.TrueSkill.Layers
                                                  TeamDifferencesComparisonLayer<TPlayer> teamDifferencesComparisonLayer)
             : base(parentGraph)
         {
-            _TeamPerformancesToTeamPerformanceDifferencesLayer = teamPerformancesToPerformanceDifferences;
-            _TeamDifferencesComparisonLayer = teamDifferencesComparisonLayer;
+            _teamPerformancesToTeamPerformanceDifferencesLayer = teamPerformancesToPerformanceDifferences;
+            _teamDifferencesComparisonLayer = teamDifferencesComparisonLayer;
         }
 
         public override IEnumerable<Factor<GaussianDistribution>> UntypedFactors
@@ -32,24 +32,24 @@ namespace Moserware.Skills.TrueSkill.Layers
             get
             {
                 return
-                    _TeamPerformancesToTeamPerformanceDifferencesLayer.UntypedFactors.Concat(
-                        _TeamDifferencesComparisonLayer.UntypedFactors);
+                    _teamPerformancesToTeamPerformanceDifferencesLayer.UntypedFactors.Concat(
+                        _teamDifferencesComparisonLayer.UntypedFactors);
             }
         }
 
         public override void BuildLayer()
         {
-            _TeamPerformancesToTeamPerformanceDifferencesLayer.SetRawInputVariablesGroups(InputVariablesGroups);
-            _TeamPerformancesToTeamPerformanceDifferencesLayer.BuildLayer();
+            _teamPerformancesToTeamPerformanceDifferencesLayer.SetRawInputVariablesGroups(InputVariablesGroups);
+            _teamPerformancesToTeamPerformanceDifferencesLayer.BuildLayer();
 
-            _TeamDifferencesComparisonLayer.SetRawInputVariablesGroups(
-                _TeamPerformancesToTeamPerformanceDifferencesLayer.GetRawOutputVariablesGroups());
-            _TeamDifferencesComparisonLayer.BuildLayer();
+            _teamDifferencesComparisonLayer.SetRawInputVariablesGroups(
+                _teamPerformancesToTeamPerformanceDifferencesLayer.GetRawOutputVariablesGroups());
+            _teamDifferencesComparisonLayer.BuildLayer();
         }
 
         public override Schedule<GaussianDistribution> CreatePriorSchedule()
         {
-            Schedule<GaussianDistribution> loop = null;
+            Schedule<GaussianDistribution> loop;
 
             switch (InputVariablesGroups.Count)
             {
@@ -65,8 +65,7 @@ namespace Moserware.Skills.TrueSkill.Layers
             }
 
             // When dealing with differences, there are always (n-1) differences, so add in the 1
-            int totalTeamDifferences = _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors.Count;
-            int totalTeams = totalTeamDifferences + 1;
+            int totalTeamDifferences = _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors.Count;
 
             var innerSchedule = new ScheduleSequence<GaussianDistribution>(
                 "inner schedule",
@@ -75,11 +74,10 @@ namespace Moserware.Skills.TrueSkill.Layers
                         loop,
                         new ScheduleStep<GaussianDistribution>(
                             "teamPerformanceToPerformanceDifferenceFactors[0] @ 1",
-                            _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[0], 1),
+                            _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[0], 1),
                         new ScheduleStep<GaussianDistribution>(
-                            String.Format("teamPerformanceToPerformanceDifferenceFactors[teamTeamDifferences = {0} - 1] @ 2",
-                                          totalTeamDifferences),
-                            _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[totalTeamDifferences - 1], 2)
+                            $"teamPerformanceToPerformanceDifferenceFactors[teamTeamDifferences = {totalTeamDifferences} - 1] @ 2",
+                            _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[totalTeamDifferences - 1], 2)
                     }
                 );
 
@@ -93,11 +91,11 @@ namespace Moserware.Skills.TrueSkill.Layers
                     {
                         new ScheduleStep<GaussianDistribution>(
                             "send team perf to perf differences",
-                            _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[0],
+                            _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[0],
                             0),
                         new ScheduleStep<GaussianDistribution>(
                             "send to greater than or within factor",
-                            _TeamDifferencesComparisonLayer.LocalFactors[0],
+                            _teamDifferencesComparisonLayer.LocalFactors[0],
                             0)
                     },
                 "loop of just two teams inner sequence");
@@ -105,7 +103,7 @@ namespace Moserware.Skills.TrueSkill.Layers
 
         private Schedule<GaussianDistribution> CreateMultipleTeamInnerPriorLoopSchedule()
         {
-            int totalTeamDifferences = _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors.Count;
+            int totalTeamDifferences = _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors.Count;
 
             var forwardScheduleList = new List<Schedule<GaussianDistribution>>();
 
@@ -116,18 +114,15 @@ namespace Moserware.Skills.TrueSkill.Layers
                         new Schedule<GaussianDistribution>[]
                             {
                                 new ScheduleStep<GaussianDistribution>(
-                                    String.Format("team perf to perf diff {0}",
-                                                  i),
-                                    _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[i], 0),
+                                    $"team perf to perf diff {i}",
+                                    _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[i], 0),
                                 new ScheduleStep<GaussianDistribution>(
-                                    String.Format("greater than or within result factor {0}",
-                                                  i),
-                                    _TeamDifferencesComparisonLayer.LocalFactors[i],
+                                    $"greater than or within result factor {i}",
+                                    _teamDifferencesComparisonLayer.LocalFactors[i],
                                     0),
                                 new ScheduleStep<GaussianDistribution>(
-                                    String.Format("team perf to perf diff factors [{0}], 2",
-                                                  i),
-                                    _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[i], 2)
+                                    $"team perf to perf diff factors [{i}], 2",
+                                    _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[i], 2)
                             }, "current forward schedule piece {0}", i);
 
                 forwardScheduleList.Add(currentForwardSchedulePiece);
@@ -147,18 +142,15 @@ namespace Moserware.Skills.TrueSkill.Layers
                     new Schedule<GaussianDistribution>[]
                         {
                             new ScheduleStep<GaussianDistribution>(
-                                String.Format("teamPerformanceToPerformanceDifferenceFactors[totalTeamDifferences - 1 - {0}] @ 0",
-                                              i),
-                                _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[
+                                $"teamPerformanceToPerformanceDifferenceFactors[totalTeamDifferences - 1 - {i}] @ 0",
+                                _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[
                                     totalTeamDifferences - 1 - i], 0),
                             new ScheduleStep<GaussianDistribution>(
-                                String.Format("greaterThanOrWithinResultFactors[totalTeamDifferences - 1 - {0}] @ 0",
-                                              i),
-                                _TeamDifferencesComparisonLayer.LocalFactors[totalTeamDifferences - 1 - i], 0),
+                                $"greaterThanOrWithinResultFactors[totalTeamDifferences - 1 - {i}] @ 0",
+                                _teamDifferencesComparisonLayer.LocalFactors[totalTeamDifferences - 1 - i], 0),
                             new ScheduleStep<GaussianDistribution>(
-                                String.Format("teamPerformanceToPerformanceDifferenceFactors[totalTeamDifferences - 1 - {0}] @ 1",
-                                              i),
-                                _TeamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[
+                                $"teamPerformanceToPerformanceDifferenceFactors[totalTeamDifferences - 1 - {i}] @ 1",
+                                _teamPerformancesToTeamPerformanceDifferencesLayer.LocalFactors[
                                     totalTeamDifferences - 1 - i], 1)
                         }
                     );
@@ -181,8 +173,7 @@ namespace Moserware.Skills.TrueSkill.Layers
             const double initialMaxDelta = 0.0001;
 
             var loop = new ScheduleLoop<GaussianDistribution>(
-                String.Format("loop with max delta of {0}",
-                              initialMaxDelta),
+                $"loop with max delta of {initialMaxDelta}",
                 forwardBackwardScheduleToLoop,
                 initialMaxDelta);
 

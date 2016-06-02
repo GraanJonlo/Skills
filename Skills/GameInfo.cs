@@ -28,22 +28,12 @@
         public double DynamicsFactor { get; set; }
         public double DrawProbability { get; set; }
 
-        public Rating DefaultRating
-        {
-            get { return new Rating(InitialMean, InitialStandardDeviation); }
-        }
+        public Rating DefaultRating => new Rating(InitialMean, InitialStandardDeviation);
 
-        public static GameInfo DefaultGameInfo
-        {
-            get
-            {
-                // We return a fresh copy since we have public setters that can mutate state
-                return new GameInfo(DefaultInitialMean,
-                                    DefaultInitialStandardDeviation,
-                                    DefaultBeta,
-                                    DefaultDynamicsFactor,
-                                    DefaultDrawProbability);
-            }
-        }
+        public static GameInfo DefaultGameInfo => new GameInfo(DefaultInitialMean,
+            DefaultInitialStandardDeviation,
+            DefaultBeta,
+            DefaultDynamicsFactor,
+            DefaultDrawProbability);
     }
 }

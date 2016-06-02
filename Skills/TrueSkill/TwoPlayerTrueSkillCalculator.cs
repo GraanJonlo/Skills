@@ -46,11 +46,13 @@ namespace Moserware.Skills.TrueSkill
 
             bool wasDraw = (teamRanks[0] == teamRanks[1]);
 
-            var results = new Dictionary<TPlayer, Rating>();
-            results[winner] = CalculateNewRating(gameInfo, winnerPreviousRating, loserPreviousRating,
-                                                 wasDraw ? PairwiseComparison.Draw : PairwiseComparison.Win);
-            results[loser] = CalculateNewRating(gameInfo, loserPreviousRating, winnerPreviousRating,
-                                                wasDraw ? PairwiseComparison.Draw : PairwiseComparison.Lose);
+            var results = new Dictionary<TPlayer, Rating>
+            {
+                [winner] = CalculateNewRating(gameInfo, winnerPreviousRating, loserPreviousRating,
+                    wasDraw ? PairwiseComparison.Draw : PairwiseComparison.Win),
+                [loser] = CalculateNewRating(gameInfo, loserPreviousRating, winnerPreviousRating,
+                    wasDraw ? PairwiseComparison.Draw : PairwiseComparison.Lose)
+            };
 
             // And we're done!
             return results;

@@ -1,5 +1,4 @@
-﻿
-namespace Moserware.Skills.Elo
+﻿namespace Moserware.Skills.Elo
 {
     /// <summary>
     /// An Elo rating represented by a single number (mean).

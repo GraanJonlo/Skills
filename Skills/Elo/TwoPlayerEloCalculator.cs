@@ -67,7 +67,6 @@ namespace Moserware.Skills.Elo
             ValidateTeamCountAndPlayersCountPerTeam(teams);
             double player1Rating = teams.First().First().Value.Mean;
             double player2Rating = teams.Last().First().Value.Mean;
-            double ratingDifference = player1Rating - player2Rating;
 
             // The TrueSkill paper mentions that they used s1 - s2 (rating difference) to
             // determine match quality. I convert that to a percentage as a delta from 50%

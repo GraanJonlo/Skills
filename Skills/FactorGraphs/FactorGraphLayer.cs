@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Moserware.Skills.FactorGraphs
 {
@@ -33,38 +32,26 @@ namespace Moserware.Skills.FactorGraphs
         where TFactor : Factor<TValue>
         where TOutputVariable : TBaseVariable
     {
-        private readonly List<TFactor> _LocalFactors = new List<TFactor>();
-        private readonly List<IList<TOutputVariable>> _OutputVariablesGroups = new List<IList<TOutputVariable>>();
-        private IList<IList<TInputVariable>> _InputVariablesGroups = new List<IList<TInputVariable>>();
+        private readonly List<TFactor> _localFactors = new List<TFactor>();
+        private readonly List<IList<TOutputVariable>> _outputVariablesGroups = new List<IList<TOutputVariable>>();
+        private IList<IList<TInputVariable>> _inputVariablesGroups = new List<IList<TInputVariable>>();
 
         protected FactorGraphLayer(TParentGraph parentGraph)
         {
             ParentFactorGraph = parentGraph;
         }
 
-        protected IList<IList<TInputVariable>> InputVariablesGroups
-        {
-            get { return _InputVariablesGroups; }
-        }
+        protected IList<IList<TInputVariable>> InputVariablesGroups => _inputVariablesGroups;
 
         // HACK
 
         public TParentGraph ParentFactorGraph { get; private set; }
 
-        public IList<IList<TOutputVariable>> OutputVariablesGroups
-        {
-            get { return _OutputVariablesGroups; }
-        }
+        public IList<IList<TOutputVariable>> OutputVariablesGroups => _outputVariablesGroups;
 
-        public IList<TFactor> LocalFactors
-        {
-            get { return _LocalFactors; }
-        }
+        public IList<TFactor> LocalFactors => _localFactors;
 
-        public override IEnumerable<Factor<TValue>> UntypedFactors
-        {
-            get { return _LocalFactors.Cast<Factor<TValue>>(); }
-        }
+        public override IEnumerable<Factor<TValue>> UntypedFactors => _localFactors;
 
         public override void SetRawInputVariablesGroups(object value)
         {
@@ -75,12 +62,12 @@ namespace Moserware.Skills.FactorGraphs
                 throw new ArgumentException();
             }
 
-            _InputVariablesGroups = newList;
+            _inputVariablesGroups = newList;
         }
 
         public override object GetRawOutputVariablesGroups()
         {
-            return _OutputVariablesGroups;
+            return _outputVariablesGroups;
         }
 
         protected Schedule<TValue> ScheduleSequence<TSchedule>(
@@ -96,7 +83,7 @@ namespace Moserware.Skills.FactorGraphs
 
         protected void AddLayerFactor(TFactor factor)
         {
-            _LocalFactors.Add(factor);
+            _localFactors.Add(factor);
         }
 
         // Helper utility

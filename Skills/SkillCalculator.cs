@@ -11,9 +11,9 @@ namespace Moserware.Skills
         [Flags]
         public enum SupportedOptions
         {
-            None          = 0x00,
-            PartialPlay   = 0x01,
-            PartialUpdate = 0x02,
+            None          = 0,
+            PartialPlay   = 1,
+            PartialUpdate = 2,
         }
 
         private readonly SupportedOptions _supportedOptions;
@@ -52,8 +52,8 @@ namespace Moserware.Skills
                                                               IEnumerable<IDictionary<TPlayer, Rating>> teams);
 
         public bool IsSupported(SupportedOptions option)
-        {           
-            return (_supportedOptions & option) == option;             
+        {
+            return _supportedOptions.HasFlag(option);
         }
 
         protected void ValidateTeamCountAndPlayersCountPerTeam<TPlayer>(IEnumerable<IDictionary<TPlayer, Rating>> teams)

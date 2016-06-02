@@ -12,18 +12,18 @@ namespace Moserware.Skills.TrueSkill.Layers
             <TPlayer, DefaultVariable<GaussianDistribution>, GaussianPriorFactor,
             KeyedVariable<TPlayer, GaussianDistribution>>
     {
-        private readonly IEnumerable<IDictionary<TPlayer, Rating>> _Teams;
+        private readonly IEnumerable<IDictionary<TPlayer, Rating>> _teams;
 
         public PlayerPriorValuesToSkillsLayer(TrueSkillFactorGraph<TPlayer> parentGraph,
                                               IEnumerable<IDictionary<TPlayer, Rating>> teams)
             : base(parentGraph)
         {
-            _Teams = teams;
+            _teams = teams;
         }
 
         public override void BuildLayer()
         {
-            foreach (var currentTeam in _Teams)
+            foreach (var currentTeam in _teams)
             {
                 var currentTeamSkills = new List<KeyedVariable<TPlayer, GaussianDistribution>>();
 
@@ -31,7 +31,7 @@ namespace Moserware.Skills.TrueSkill.Layers
                 {
                     KeyedVariable<TPlayer, GaussianDistribution> playerSkill =
                         CreateSkillOutputVariable(currentTeamPlayer.Key);
-                    AddLayerFactor(CreatePriorFactor(currentTeamPlayer.Key, currentTeamPlayer.Value, playerSkill));
+                    AddLayerFactor(CreatePriorFactor(currentTeamPlayer.Value, playerSkill));
                     currentTeamSkills.Add(playerSkill);
                 }
 
@@ -47,7 +47,7 @@ namespace Moserware.Skills.TrueSkill.Layers
                 "All priors");
         }
 
-        private GaussianPriorFactor CreatePriorFactor(TPlayer player, Rating priorRating,
+        private GaussianPriorFactor CreatePriorFactor(Rating priorRating,
                                                       Variable<GaussianDistribution> skillsVariable)
         {
             return new GaussianPriorFactor(priorRating.Mean,

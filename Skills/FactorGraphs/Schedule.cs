@@ -5,11 +5,11 @@ namespace Moserware.Skills.FactorGraphs
 {
     public abstract class Schedule<T>
     {
-        private readonly string _Name;
+        private readonly string _name;
 
         protected Schedule(string name)
         {
-            _Name = name;
+            _name = name;
         }
 
         public abstract double Visit(int depth, int maxDepth);
@@ -21,25 +21,25 @@ namespace Moserware.Skills.FactorGraphs
                 
         public override string ToString()
         {
-            return _Name;
+            return _name;
         }
     }
 
     public class ScheduleStep<T> : Schedule<T>
     {
-        private readonly Factor<T> _Factor;
-        private readonly int _Index;
+        private readonly Factor<T> _factor;
+        private readonly int _index;
 
         public ScheduleStep(string name, Factor<T> factor, int index)
             : base(name)
         {
-            _Factor = factor;
-            _Index = index;
+            _factor = factor;
+            _index = index;
         }
 
         public override double Visit(int depth, int maxDepth)
         {
-            double delta = _Factor.UpdateMessage(_Index);
+            double delta = _factor.UpdateMessage(_index);
             return delta;
         }
     }
@@ -55,19 +55,19 @@ namespace Moserware.Skills.FactorGraphs
     public class ScheduleSequence<TValue, TSchedule> : Schedule<TValue>
         where TSchedule : Schedule<TValue>
     {
-        private readonly IEnumerable<TSchedule> _Schedules;
+        private readonly IEnumerable<TSchedule> _schedules;
 
         public ScheduleSequence(string name, IEnumerable<TSchedule> schedules)
             : base(name)
         {
-            _Schedules = schedules;
+            _schedules = schedules;
         }
 
         public override double Visit(int depth, int maxDepth)
         {
             double maxDelta = 0;
 
-            foreach (TSchedule currentSchedule in _Schedules)
+            foreach (TSchedule currentSchedule in _schedules)
             {
                 maxDelta = Math.Max(currentSchedule.Visit(depth + 1, maxDepth), maxDelta);
             }
@@ -78,24 +78,22 @@ namespace Moserware.Skills.FactorGraphs
 
     public class ScheduleLoop<T> : Schedule<T>
     {
-        private readonly double _MaxDelta;
-        private readonly Schedule<T> _ScheduleToLoop;
+        private readonly double _maxDelta;
+        private readonly Schedule<T> _scheduleToLoop;
 
         public ScheduleLoop(string name, Schedule<T> scheduleToLoop, double maxDelta)
             : base(name)
         {
-            _ScheduleToLoop = scheduleToLoop;
-            _MaxDelta = maxDelta;
+            _scheduleToLoop = scheduleToLoop;
+            _maxDelta = maxDelta;
         }
 
         public override double Visit(int depth, int maxDepth)
         {
-            int totalIterations = 1;
-            double delta = _ScheduleToLoop.Visit(depth + 1, maxDepth);
-            while (delta > _MaxDelta)
+            double delta = _scheduleToLoop.Visit(depth + 1, maxDepth);
+            while (delta > _maxDelta)
             {
-                delta = _ScheduleToLoop.Visit(depth + 1, maxDepth);
-                totalIterations++;
+                delta = _scheduleToLoop.Visit(depth + 1, maxDepth);
             }
 
             return delta;

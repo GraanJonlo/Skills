@@ -4,13 +4,13 @@ namespace Moserware.Skills.FactorGraphs
 {
     public class Variable<TValue>
     {
-        private readonly string _Name;
-        private readonly TValue _Prior;
+        private readonly string _name;
+        private readonly TValue _prior;
 
         public Variable(string name, TValue prior)
         {
-            _Name = "Variable[" + name + "]";
-            _Prior = prior;
+            _name = "Variable[" + name + "]";
+            _prior = prior;
             ResetToPrior();
         }
 
@@ -18,12 +18,12 @@ namespace Moserware.Skills.FactorGraphs
 
         public void ResetToPrior()
         {
-            Value = _Prior;
+            Value = _prior;
         }
 
         public override string ToString()
         {
-            return _Name;
+            return _name;
         }
     }
 

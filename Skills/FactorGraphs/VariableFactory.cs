@@ -1,23 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Moserware.Skills.FactorGraphs
 {
     public class VariableFactory<TValue>
     {
         // using a Func<TValue> to encourage fresh copies in case it's overwritten
-        private readonly Func<TValue> _VariablePriorInitializer;
+        private readonly Func<TValue> _variablePriorInitializer;
 
         public VariableFactory(Func<TValue> variablePriorInitializer)
         {
-            _VariablePriorInitializer = variablePriorInitializer;
+            _variablePriorInitializer = variablePriorInitializer;
         }
 
         public Variable<TValue> CreateBasicVariable(string nameFormat, params object[] args)
         {
             var newVar = new Variable<TValue>(
                 String.Format(nameFormat, args),                                
-                _VariablePriorInitializer());
+                _variablePriorInitializer());
 
             return newVar;
         }
@@ -27,7 +26,7 @@ namespace Moserware.Skills.FactorGraphs
             var newVar = new KeyedVariable<TKey, TValue>(
                 key,
                 String.Format(nameFormat, args),                                
-                _VariablePriorInitializer());
+                _variablePriorInitializer());
             
             return newVar;
         }

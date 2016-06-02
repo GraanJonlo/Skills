@@ -8,7 +8,7 @@ namespace Moserware.Skills
     /// </summary>
     public class Team<TPlayer>
     {
-        private readonly Dictionary<TPlayer, Rating> _PlayerRatings = new Dictionary<TPlayer, Rating>();
+        private readonly Dictionary<TPlayer, Rating> _playerRatings = new Dictionary<TPlayer, Rating>();
 
         /// <summary>
         /// Constructs a new team.
@@ -35,7 +35,7 @@ namespace Moserware.Skills
         /// <returns>The instance of the team (for chaining convenience).</returns>
         public Team<TPlayer> AddPlayer(TPlayer player, Rating rating)
         {
-            _PlayerRatings[player] = rating;
+            _playerRatings[player] = rating;
             return this;
         }
 
@@ -45,7 +45,7 @@ namespace Moserware.Skills
         /// <returns>The <see cref="Team"/> as a simple dictionary.</returns>
         public IDictionary<TPlayer, Rating> AsDictionary()
         {
-            return _PlayerRatings;
+            return _playerRatings;
         }
     }
 

@@ -43,12 +43,14 @@ namespace Moserware.Numerics
 
         public GaussianDistribution Clone()
         {
-            var result = new GaussianDistribution();
-            result.Mean = Mean;
-            result.StandardDeviation = StandardDeviation;
-            result.Variance = Variance;
-            result.Precision = Precision;
-            result.PrecisionMean = PrecisionMean;
+            var result = new GaussianDistribution
+            {
+                Mean = Mean,
+                StandardDeviation = StandardDeviation,
+                Variance = Variance,
+                Precision = Precision,
+                PrecisionMean = PrecisionMean
+            };
             return result;
         }
 

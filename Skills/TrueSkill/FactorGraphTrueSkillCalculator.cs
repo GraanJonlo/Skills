@@ -28,8 +28,6 @@ namespace Moserware.Skills.TrueSkill
             factorGraph.BuildGraph();
             factorGraph.RunSchedule();
 
-            double probabilityOfOutcome = factorGraph.GetProbabilityOfRanking();
-
             return factorGraph.GetUpdatedRatings();
         }
 

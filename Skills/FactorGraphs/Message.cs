@@ -4,8 +4,8 @@ namespace Moserware.Skills.FactorGraphs
 {
     public class Message<T>
     {
-        private readonly string _NameFormat;
-        private readonly object[] _NameFormatArgs;
+        private readonly string _nameFormat;
+        private readonly object[] _nameFormatArgs;
 
         public Message()
             : this(default(T), null, null)
@@ -15,8 +15,8 @@ namespace Moserware.Skills.FactorGraphs
         public Message(T value, string nameFormat, params object[] args)
 
         {
-            _NameFormat = nameFormat;
-            _NameFormatArgs = args;
+            _nameFormat = nameFormat;
+            _nameFormatArgs = args;
             Value = value;
         }
 
@@ -24,7 +24,7 @@ namespace Moserware.Skills.FactorGraphs
 
         public override string ToString()
         {
-            return (_NameFormat == null) ? base.ToString() : String.Format(_NameFormat, _NameFormatArgs);
+            return (_nameFormat == null) ? base.ToString() : String.Format(_nameFormat, _nameFormatArgs);
         }
     }
 }
