@@ -16,15 +16,15 @@ namespace Moserware.Skills
             PartialUpdate = 0x02,
         }
 
-        private readonly SupportedOptions _SupportedOptions;
-        private readonly PlayersRange _PlayersPerTeamAllowed;
-        private readonly TeamsRange _TotalTeamsAllowed;
+        private readonly SupportedOptions _supportedOptions;
+        private readonly PlayersRange _playersPerTeamAllowed;
+        private readonly TeamsRange _totalTeamsAllowed;
         
         protected SkillCalculator(SupportedOptions supportedOptions, TeamsRange totalTeamsAllowed, PlayersRange playerPerTeamAllowed)
         {
-            _SupportedOptions = supportedOptions;
-            _TotalTeamsAllowed = totalTeamsAllowed;
-            _PlayersPerTeamAllowed = playerPerTeamAllowed;
+            _supportedOptions = supportedOptions;
+            _totalTeamsAllowed = totalTeamsAllowed;
+            _playersPerTeamAllowed = playerPerTeamAllowed;
         }
 
         /// <summary>
@@ -53,21 +53,12 @@ namespace Moserware.Skills
 
         public bool IsSupported(SupportedOptions option)
         {           
-            return (_SupportedOptions & option) == option;             
-        }
-
-        /// <summary>
-        /// Helper function to square the <paramref name="value"/>.
-        /// </summary>        
-        /// <returns><param name="value"/> * <param name="value"/></returns>
-        protected static double Square(double value)
-        {
-            return value*value;
+            return (_supportedOptions & option) == option;             
         }
 
         protected void ValidateTeamCountAndPlayersCountPerTeam<TPlayer>(IEnumerable<IDictionary<TPlayer, Rating>> teams)
         {
-            ValidateTeamCountAndPlayersCountPerTeam(teams, _TotalTeamsAllowed, _PlayersPerTeamAllowed);
+            ValidateTeamCountAndPlayersCountPerTeam(teams, _totalTeamsAllowed, _playersPerTeamAllowed);
         }
 
         private static void ValidateTeamCountAndPlayersCountPerTeam<TPlayer>(

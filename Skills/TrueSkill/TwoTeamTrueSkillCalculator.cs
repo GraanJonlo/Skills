@@ -58,17 +58,17 @@ namespace Moserware.Skills.TrueSkill
                                                          PairwiseComparison selfToOtherTeamComparison)
         {
             double drawMargin = DrawMargin.GetDrawMarginFromDrawProbability(gameInfo.DrawProbability, gameInfo.Beta);
-            double betaSquared = Square(gameInfo.Beta);
-            double tauSquared = Square(gameInfo.DynamicsFactor);
+            double betaSquared = Math.Pow(gameInfo.Beta, 2);
+            double tauSquared = Math.Pow(gameInfo.DynamicsFactor, 2);
 
             int totalPlayers = selfTeam.Count() + otherTeam.Count();
 
             double selfMeanSum = selfTeam.Values.Sum(r => r.Mean);
             double otherTeamMeanSum = otherTeam.Values.Sum(r => r.Mean);
 
-            double c = Math.Sqrt(selfTeam.Values.Sum(r => Square(r.StandardDeviation))
+            double c = Math.Sqrt(selfTeam.Values.Sum(r => Math.Pow(r.StandardDeviation, 2))
                                  +
-                                 otherTeam.Values.Sum(r => Square(r.StandardDeviation))
+                                 otherTeam.Values.Sum(r => Math.Pow(r.StandardDeviation, 2))
                                  +
                                  totalPlayers*betaSquared);
 
@@ -112,14 +112,14 @@ namespace Moserware.Skills.TrueSkill
             {
                 Rating previousPlayerRating = teamPlayerRatingPair.Value;
 
-                double meanMultiplier = (Square(previousPlayerRating.StandardDeviation) + tauSquared)/c;
-                double stdDevMultiplier = (Square(previousPlayerRating.StandardDeviation) + tauSquared)/Square(c);
+                double meanMultiplier = (Math.Pow(previousPlayerRating.StandardDeviation, 2) + tauSquared)/c;
+                double stdDevMultiplier = (Math.Pow(previousPlayerRating.StandardDeviation, 2) + tauSquared)/Math.Pow(c, 2);
 
                 double playerMeanDelta = (rankMultiplier*meanMultiplier*v);
                 double newMean = previousPlayerRating.Mean + playerMeanDelta;
 
                 double newStdDev =
-                    Math.Sqrt((Square(previousPlayerRating.StandardDeviation) + tauSquared)*(1 - w*stdDevMultiplier));
+                    Math.Sqrt((Math.Pow(previousPlayerRating.StandardDeviation, 2) + tauSquared)*(1 - w*stdDevMultiplier));
 
                 newPlayerRatings[teamPlayerRatingPair.Key] = new Rating(newMean, newStdDev);
             }
@@ -141,13 +141,13 @@ namespace Moserware.Skills.TrueSkill
 
             int totalPlayers = team1Count + team2Count;
 
-            double betaSquared = Square(gameInfo.Beta);
+            double betaSquared = Math.Pow(gameInfo.Beta, 2);
 
             double team1MeanSum = team1.Sum(r => r.Mean);
-            double team1StdDevSquared = team1.Sum(r => Square(r.StandardDeviation));
+            double team1StdDevSquared = team1.Sum(r => Math.Pow(r.StandardDeviation, 2));
 
             double team2MeanSum = team2.Sum(r => r.Mean);
-            double team2SigmaSquared = team2.Sum(r => Square(r.StandardDeviation));
+            double team2SigmaSquared = team2.Sum(r => Math.Pow(r.StandardDeviation, 2));
 
             // This comes from equation 4.1 in the TrueSkill paper on page 8            
             // The equation was broken up into the part under the square root sign and 
@@ -162,7 +162,7 @@ namespace Moserware.Skills.TrueSkill
 
             double expPart
                 = Math.Exp(
-                    (-1*Square(team1MeanSum - team2MeanSum))
+                    (-1*Math.Pow(team1MeanSum - team2MeanSum, 2))
                     /
                     (2*(totalPlayers*betaSquared + team1StdDevSquared + team2SigmaSquared))
                     );

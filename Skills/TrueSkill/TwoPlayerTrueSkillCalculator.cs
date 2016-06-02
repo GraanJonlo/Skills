@@ -63,11 +63,11 @@ namespace Moserware.Skills.TrueSkill
 
             double c =
                 Math.Sqrt(
-                    Square(selfRating.StandardDeviation)
+                    Math.Pow(selfRating.StandardDeviation, 2)
                     +
-                    Square(opponentRating.StandardDeviation)
+                    Math.Pow(opponentRating.StandardDeviation, 2)
                     +
-                    2*Square(gameInfo.Beta));
+                    2*Math.Pow(gameInfo.Beta, 2));
 
             double winningMean = selfRating.Mean;
             double losingMean = opponentRating.Mean;
@@ -104,10 +104,10 @@ namespace Moserware.Skills.TrueSkill
                 rankMultiplier = 1;
             }
 
-            double meanMultiplier = (Square(selfRating.StandardDeviation) + Square(gameInfo.DynamicsFactor))/c;
+            double meanMultiplier = (Math.Pow(selfRating.StandardDeviation, 2) + Math.Pow(gameInfo.DynamicsFactor, 2))/c;
 
-            double varianceWithDynamics = Square(selfRating.StandardDeviation) + Square(gameInfo.DynamicsFactor);
-            double stdDevMultiplier = varianceWithDynamics/Square(c);
+            double varianceWithDynamics = Math.Pow(selfRating.StandardDeviation, 2) + Math.Pow(gameInfo.DynamicsFactor, 2);
+            double stdDevMultiplier = varianceWithDynamics/Math.Pow(c, 2);
 
             double newMean = selfRating.Mean + (rankMultiplier*meanMultiplier*v);
             double newStdDev = Math.Sqrt(varianceWithDynamics*(1 - w*stdDevMultiplier));
@@ -126,9 +126,9 @@ namespace Moserware.Skills.TrueSkill
             Rating player2Rating = teams.Last().Values.First();
 
             // We just use equation 4.1 found on page 8 of the TrueSkill 2006 paper:
-            double betaSquared = Square(gameInfo.Beta);
-            double player1SigmaSquared = Square(player1Rating.StandardDeviation);
-            double player2SigmaSquared = Square(player2Rating.StandardDeviation);
+            double betaSquared = Math.Pow(gameInfo.Beta, 2);
+            double player1SigmaSquared = Math.Pow(player1Rating.StandardDeviation, 2);
+            double player2SigmaSquared = Math.Pow(player2Rating.StandardDeviation, 2);
 
             // This is the square root part of the equation:
             double sqrtPart =
@@ -140,7 +140,7 @@ namespace Moserware.Skills.TrueSkill
             // This is the exponent part of the equation:
             double expPart =
                 Math.Exp(
-                    (-1*Square(player1Rating.Mean - player2Rating.Mean))
+                    (-1*Math.Pow(player1Rating.Mean - player2Rating.Mean, 2))
                     /
                     (2*(2*betaSquared + player1SigmaSquared + player2SigmaSquared)));
 

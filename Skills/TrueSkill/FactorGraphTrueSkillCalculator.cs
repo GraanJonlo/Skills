@@ -46,7 +46,7 @@ namespace Moserware.Skills.TrueSkill
             Matrix playerTeamAssignmentsMatrix = CreatePlayerTeamAssignmentMatrix(teamAssignmentsList, meanVector.Rows);
             Matrix playerTeamAssignmentsMatrixTranspose = playerTeamAssignmentsMatrix.Transpose;
 
-            double betaSquared = Square(gameInfo.Beta);
+            double betaSquared = Math.Pow(gameInfo.Beta, 2);
 
             Matrix start = meanVectorTranspose * playerTeamAssignmentsMatrix;
             Matrix aTa = (betaSquared * playerTeamAssignmentsMatrixTranspose) * playerTeamAssignmentsMatrix;
@@ -82,7 +82,7 @@ namespace Moserware.Skills.TrueSkill
             // This is a square matrix whose diagonal values represent the variance (square of standard deviation) of all
             // players.
             return
-                new DiagonalMatrix(GetPlayerRatingValues(teamAssignmentsList, rating => Square(rating.StandardDeviation)));
+                new DiagonalMatrix(GetPlayerRatingValues(teamAssignmentsList, rating => Math.Pow(rating.StandardDeviation, 2)));
         }
 
         // Helper function that gets a list of values for all player ratings

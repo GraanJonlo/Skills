@@ -9,11 +9,11 @@ namespace Moserware.Skills
     internal static class RankSorter
     {
         /// <summary>
-        /// Performs an in-place sort of the <paramref name="items"/> in according to the <paramref name="ranks"/> in non-decreasing order.
+        /// Performs an in-place sort of the <paramref name="teams"/> in according to the <paramref name="teamRanks"/> in non-decreasing order.
         /// </summary>
         /// <typeparam name="T">The types of items to sort.</typeparam>
-        /// <param name="items">The items to sort according to the order specified by <paramref name="ranks"/>.</param>
-        /// <param name="ranks">The ranks for each item where 1 is first place.</param>
+        /// <param name="teams">The items to sort according to the order specified by <paramref name="teamRanks"/>.</param>
+        /// <param name="teamRanks">The ranks for each item where 1 is first place.</param>
         public static void Sort<T>(ref IEnumerable<T> teams, ref int[] teamRanks)
         {
             Guard.ArgumentNotNull(teams, "teams");
